@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Zap, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Product, Category } from '@/lib/types';
 import ProductCard from '@/components/features/ProductCard';
@@ -9,156 +9,207 @@ import Footer from '@/components/layout/Footer';
 import WhatsAppBubble from '@/components/features/WhatsAppBubble';
 import heroImage from '@/assets/hero.jpg';
 
+const BRANDS = ['STREETWEAR', 'UNISEX', 'QUALITY FITS', 'URBAN STYLE', 'TRENDING', 'EXCLUSIVES'];
+
 export default function Home() {
   const [featured, setFeatured] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  const HERO_PHRASES = ['DRESS\nDIFFERENT.', 'WEAR\nBOLD.', 'STAY\nFRESH.'];
 
   useEffect(() => {
-    const fetchData = async () => {
-      const [productsRes, categoriesRes] = await Promise.all([
-        supabase
-          .from('products')
-          .select('*, product_variants(*)')
-          .eq('is_featured', true)
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
-          .limit(6),
-        supabase.from('categories').select('*').order('name'),
-      ]);
-      if (productsRes.data) setFeatured(productsRes.data);
-      if (categoriesRes.data) setCategories(categoriesRes.data);
+    const interval = setInterval(() => {
+      setHeroIndex((i) => (i + 1) % HERO_PHRASES.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    Promise.all([
+      supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .eq('is_featured', true)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(6),
+      supabase.from('categories').select('*').order('name'),
+    ]).then(([pRes, cRes]) => {
+      if (pRes.data) setFeatured(pRes.data);
+      if (cRes.data) setCategories(cRes.data);
       setLoading(false);
-    };
-    fetchData();
+    });
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-navy-950">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
-        <div
-          className="absolute inset-0 bg-dh-hero"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-dh-purple-darker/90 via-dh-purple-darker/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-dh-purple-darker/80 via-transparent to-transparent" />
+      {/* HERO */}
+      <section className="relative min-h-screen flex items-end overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img
+            src={heroImage}
+            alt="DH-Inspired Hero"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/60 to-navy-950/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-navy-950/80 to-transparent" />
+          {/* Grid overlay */}
+          <div className="absolute inset-0 bg-grid opacity-30" />
+        </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-2xl animate-slide-up">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium px-4 py-2 rounded-full border border-white/20 mb-6">
-              <Sparkles className="w-4 h-4 text-dh-gold" />
-              New Collection Available
+        {/* Animated scan line */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute w-full h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"
+            style={{ animation: 'scanline 8s linear infinite' }}
+          />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-32 w-full">
+          <div className="max-w-3xl">
+            {/* Tag */}
+            <div className="inline-flex items-center gap-2 border border-blue-500/40 bg-blue-500/10 text-blue-400 text-xs font-black px-3 py-1.5 tracking-[0.2em] uppercase mb-6 animate-fade-in">
+              <Zap className="w-3 h-3 fill-current" />
+              New Drops Available
             </div>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
-              Elevate<br />
-              <span className="text-gradient-gold">Your Style.</span>
-            </h1>
-            <p className="text-white/80 text-lg sm:text-xl leading-relaxed mb-8 max-w-lg">
-              Discover curated fashion pieces that define elegance. From everyday wear to statement looks — DH-Inspired has you covered.
+
+            {/* Heading with animation */}
+            <div className="mb-6 animate-slide-up" key={heroIndex}>
+              <h1 className="font-display text-[clamp(4rem,12vw,9rem)] text-white leading-none tracking-wider whitespace-pre-line">
+                {HERO_PHRASES[heroIndex]}
+              </h1>
+            </div>
+
+            <p className="text-gray-400 text-base sm:text-lg leading-relaxed mb-8 max-w-md animate-fade-in">
+              Unisex streetwear & fashion trends. No gatekeeping — just clean fits for everyone who knows their style.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in">
               <Link
                 to="/products"
-                className="inline-flex items-center justify-center gap-2 bg-dh-purple hover:bg-dh-purple-dark text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-dh-purple/30 hover:-translate-y-0.5 active:scale-95"
+                className="dh-btn-primary inline-flex items-center justify-center gap-2 text-sm py-4 px-8"
               >
-                <ShoppingBag className="w-5 h-5" />
-                Shop Now
+                <ShoppingBag className="w-4 h-4" />
+                SHOP NOW
               </Link>
               <Link
                 to="/products"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-2xl border border-white/30 transition-all duration-300"
+                className="dh-btn-outline inline-flex items-center justify-center gap-2 py-4 px-8"
               >
-                Browse All
-                <ArrowRight className="w-5 h-5" />
+                EXPLORE ALL
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
-        </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center pt-2">
-            <div className="w-1.5 h-1.5 bg-white/60 rounded-full" />
+          {/* Stats */}
+          <div className="flex gap-8 mt-14 border-t border-white/10 pt-8">
+            {[
+              { label: 'Products', value: '100+' },
+              { label: 'Unisex Styles', value: '✓' },
+              { label: 'Fast Delivery', value: '✓' },
+            ].map((s) => (
+              <div key={s.label}>
+                <p className="text-white font-black text-xl">{s.value}</p>
+                <p className="text-gray-500 text-xs tracking-widest uppercase font-medium">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* Brand ticker */}
+      <div className="bg-blue-600 py-3 overflow-hidden">
+        <div className="flex animate-marquee gap-12 whitespace-nowrap">
+          {[...BRANDS, ...BRANDS].map((b, i) => (
+            <span key={i} className="text-xs font-black tracking-[0.3em] text-white uppercase">
+              {b} <span className="text-blue-300 mx-4">✦</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Categories */}
       {categories.length > 0 && (
-        <section className="py-16 bg-purple-50/50">
+        <section className="py-16 bg-navy-900/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="font-display text-3xl font-bold text-gray-900 mb-8 text-center">
-              Shop by Category
-            </h2>
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <span className="section-tag">Browse</span>
+                <h2 className="font-display text-4xl sm:text-5xl text-white tracking-wider">CATEGORIES</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {categories.map((cat) => (
                 <Link
                   key={cat.id}
                   to={`/products?category=${cat.id}`}
-                  className="px-6 py-3 bg-white rounded-2xl border border-purple-100 text-gray-700 font-medium hover:bg-dh-purple hover:text-white hover:border-dh-purple shadow-sm hover:shadow-md transition-all duration-200"
+                  className="group flex items-center justify-between bg-navy-800 border border-navy-700 hover:border-blue-500/60 px-5 py-4 transition-all duration-200 hover:bg-navy-700"
                 >
-                  {cat.name}
+                  <span className="text-sm font-bold text-gray-300 group-hover:text-white tracking-wide uppercase transition-colors">
+                    {cat.name}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-blue-400 transition-colors" />
                 </Link>
               ))}
               <Link
                 to="/products"
-                className="px-6 py-3 bg-dh-purple/10 text-dh-purple rounded-2xl border border-dh-purple/20 font-medium hover:bg-dh-purple hover:text-white transition-all duration-200"
+                className="group flex items-center justify-between bg-blue-600 hover:bg-blue-500 border border-blue-500 px-5 py-4 transition-all duration-200"
               >
-                View All →
+                <span className="text-sm font-bold text-white tracking-wide uppercase">View All</span>
+                <ArrowRight className="w-4 h-4 text-white" />
               </Link>
             </div>
           </div>
         </section>
       )}
 
-      {/* Featured Products */}
+      {/* New Arrivals */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
-                ✨ New Arrivals
+              <span className="section-tag">Handpicked</span>
+              <h2 className="font-display text-4xl sm:text-5xl text-white tracking-wider">
+                NEW ARRIVALS
               </h2>
-              <p className="text-gray-500 mt-1">Handpicked by DH-Inspired</p>
             </div>
             <Link
               to="/products"
-              className="hidden sm:flex items-center gap-2 text-dh-purple font-semibold hover:gap-3 transition-all"
+              className="hidden sm:flex items-center gap-2 text-xs font-black tracking-[0.2em] text-gray-400 hover:text-blue-400 uppercase transition-colors"
             >
-              View All <ArrowRight className="w-4 h-4" />
+              SEE ALL <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-2xl overflow-hidden">
+                <div key={i}>
                   <div className="aspect-[3/4] skeleton" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-4 skeleton rounded" />
-                    <div className="h-4 skeleton rounded w-2/3" />
+                  <div className="mt-3 space-y-2">
+                    <div className="h-4 skeleton" />
+                    <div className="h-4 skeleton w-2/3" />
                   </div>
                 </div>
               ))}
             </div>
           ) : featured.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
-              <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-purple-100" />
-              <p className="text-lg font-medium">No featured products yet</p>
-              <p className="text-sm mt-1">Check back soon or browse all products</p>
-              <Link to="/products" className="inline-block mt-6 dh-btn-primary">
-                Browse Products
+            <div className="text-center py-20">
+              <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-navy-700" />
+              <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">No featured items yet</p>
+              <Link to="/products" className="inline-block mt-6 dh-btn-primary text-sm">
+                BROWSE PRODUCTS
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
               {featured.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
@@ -167,26 +218,31 @@ export default function Home() {
 
           <div className="text-center mt-10">
             <Link to="/products" className="dh-btn-outline inline-flex items-center gap-2">
-              Shop All Products <ArrowRight className="w-4 h-4" />
+              SHOP ALL PRODUCTS <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* CTA Banner */}
-      <section className="py-16 bg-dh-hero">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
-            Your Style, Your Statement
+      <section className="py-20 bg-blue-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-20" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl" />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <span className="text-blue-200 text-xs font-black tracking-[0.3em] uppercase mb-4 block">
+            No account needed
+          </span>
+          <h2 className="font-display text-5xl sm:text-7xl text-white tracking-wider mb-6">
+            CHECKOUT<br />IN MINUTES
           </h2>
-          <p className="text-purple-200 text-lg mb-8">
-            Checkout in minutes. No account needed — just pure, effortless shopping.
+          <p className="text-blue-100 text-base mb-8">
+            Guest checkout, bank transfer, WhatsApp confirmation. Simple.
           </p>
           <Link
             to="/products"
-            className="inline-flex items-center gap-2 bg-white text-dh-purple font-bold px-8 py-4 rounded-2xl hover:bg-purple-50 transition-all duration-200 hover:-translate-y-0.5 shadow-xl"
+            className="inline-flex items-center gap-2 bg-white text-navy-950 font-black text-sm px-10 py-4 tracking-widest uppercase hover:bg-blue-50 transition-colors"
           >
-            Start Shopping <ArrowRight className="w-5 h-5" />
+            START SHOPPING <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>

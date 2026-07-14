@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface SocialLinks {
@@ -35,14 +35,6 @@ function XIcon() {
   );
 }
 
-function ShopifyIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M20.924 7.625a1.523 1.523 0 00-1.238-1.044l-1.399-.19c-.07-.47-.285-.908-.642-1.264A2.366 2.366 0 0016 4.2c-.02 0-.041 0-.06.003l-.492-.724A2.374 2.374 0 0013.5 2.46a2.37 2.37 0 00-2.263 1.636L9.672 4.59c-.615.16-1.073.627-1.234 1.243l-2.41 9.23a.497.497 0 00.48.624h10.98a.497.497 0 00.484-.382l2.018-7.29a.497.497 0 00-.066-.39zM13.5 3.46c.42 0 .8.23 1.014.586l.375.55-.847.222a2.366 2.366 0 00-1.076-.847l.534-.511zM12 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
-    </svg>
-  );
-}
-
 function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -50,6 +42,20 @@ function WhatsAppIcon() {
     </svg>
   );
 }
+
+function ShopifyBagIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+      <path d="M15.337 23.979l7.216-1.561s-2.604-17.609-2.625-17.73c-.019-.119-.12-.198-.234-.198-.114 0-2.112-.044-2.112-.044s-1.408-1.37-1.571-1.532v21.065zM13.395 6.005c-.015.044-1.605.497-1.605.497s-.953-2.738-2.846-2.738c-.042 0-.083.003-.125.007.374-1.393 1.046-2.072 1.621-2.325 1.392 1.016 2.562 2.984 2.955 4.559zM9.75 3.967c-.062.019-.124.04-.185.062C9.2 2.649 8.314 1.548 7.099 1.003c.434.073.88.278 1.305.683.543.509.993 1.259 1.346 2.281zM6.765 1.201C5.479 1.706 4.498 3.337 4.063 5.724c-.84.259-1.65.509-1.651.509L.374 23.979 15.337 24V2.956l-.049.013c-.428-.858-1.044-1.422-1.752-1.603-.047-.012-.099-.02-.151-.025-.048-.005-.097-.008-.145-.008-.852 0-1.796.617-2.598 1.694-.038.052-.077.107-.116.163-.071-.199-.149-.39-.234-.575-.591-1.278-1.456-2.15-2.527-2.414z"/>
+    </svg>
+  );
+}
+
+const MARQUEE_ITEMS = [
+  'STREETWEAR', 'UNISEX FASHION', 'NEW ARRIVALS', 'QUALITY FITS', 'URBAN STYLE',
+  'DH-INSPIRED', 'STREETWEAR', 'UNISEX FASHION', 'NEW ARRIVALS', 'QUALITY FITS', 'URBAN STYLE',
+  'DH-INSPIRED',
+];
 
 export default function Footer() {
   const [socials, setSocials] = useState<SocialLinks>({
@@ -61,89 +67,63 @@ export default function Footer() {
   });
 
   useEffect(() => {
-    const fetchSocials = async () => {
-      const { data } = await supabase
-        .from('settings')
-        .select('key, value')
-        .in('key', ['instagram_url', 'tiktok_url', 'twitter_url', 'shopify_url', 'whatsapp_number']);
-      if (data) {
-        const map: Record<string, string> = {};
-        data.forEach((s: { key: string; value: string }) => { map[s.key] = s.value; });
-        setSocials({
-          instagram_url: map.instagram_url || '',
-          tiktok_url: map.tiktok_url || '',
-          twitter_url: map.twitter_url || '',
-          shopify_url: map.shopify_url || '',
-          whatsapp_number: map.whatsapp_number || '',
-        });
-      }
-    };
-    fetchSocials();
+    supabase
+      .from('settings')
+      .select('key, value')
+      .in('key', ['instagram_url', 'tiktok_url', 'twitter_url', 'shopify_url', 'whatsapp_number'])
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {};
+          data.forEach((s: { key: string; value: string }) => { map[s.key] = s.value; });
+          setSocials({
+            instagram_url: map.instagram_url || '',
+            tiktok_url: map.tiktok_url || '',
+            twitter_url: map.twitter_url || '',
+            shopify_url: map.shopify_url || '',
+            whatsapp_number: map.whatsapp_number || '',
+          });
+        }
+      });
   }, []);
 
   const socialLinks = [
-    {
-      href: socials.instagram_url,
-      icon: <InstagramIcon />,
-      label: 'Instagram',
-      color: 'hover:text-pink-600',
-    },
-    {
-      href: socials.tiktok_url,
-      icon: <TikTokIcon />,
-      label: 'TikTok',
-      color: 'hover:text-gray-900',
-    },
-    {
-      href: socials.whatsapp_number ? `https://wa.me/${socials.whatsapp_number.replace(/\D/g, '')}` : '',
-      icon: <WhatsAppIcon />,
-      label: 'WhatsApp',
-      color: 'hover:text-green-500',
-    },
-    {
-      href: socials.twitter_url,
-      icon: <XIcon />,
-      label: 'X (Twitter)',
-      color: 'hover:text-gray-900',
-    },
-    {
-      href: socials.shopify_url,
-      icon: <ShopifyIcon />,
-      label: 'Shopify',
-      color: 'hover:text-[#95BF47]',
-    },
+    { href: socials.instagram_url, icon: <InstagramIcon />, label: 'Instagram', hoverClass: 'hover:text-pink-500 hover:bg-pink-500/10' },
+    { href: socials.tiktok_url, icon: <TikTokIcon />, label: 'TikTok', hoverClass: 'hover:text-white hover:bg-white/10' },
+    { href: socials.whatsapp_number ? `https://wa.me/${socials.whatsapp_number.replace(/\D/g, '')}` : '', icon: <WhatsAppIcon />, label: 'WhatsApp', hoverClass: 'hover:text-green-400 hover:bg-green-500/10' },
+    { href: socials.twitter_url, icon: <XIcon />, label: 'X', hoverClass: 'hover:text-white hover:bg-white/10' },
+    { href: socials.shopify_url, icon: <ShopifyBagIcon />, label: 'Shopify', hoverClass: 'hover:text-[#95bf47] hover:bg-[#95bf47]/10' },
   ];
 
   return (
-    <footer className="bg-dh-purple-darker text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <footer className="bg-navy-950 border-t border-white/5">
+      {/* Marquee */}
+      <div className="overflow-hidden border-y border-white/5 bg-navy-900 py-3">
+        <div className="flex animate-marquee whitespace-nowrap gap-10">
+          {MARQUEE_ITEMS.map((item, i) => (
+            <span key={i} className="text-xs font-black tracking-[0.3em] text-gray-600 uppercase">
+              {item} <span className="text-blue-700 mx-3">✦</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <ShoppingBag className="w-6 h-6 text-dh-purple-light" />
-              <span className="font-display font-bold text-xl text-white">DH-Inspired</span>
-            </div>
-            <p className="text-purple-300 text-sm leading-relaxed">
-              Curated fashion for those who lead. Elevate your style, own your look.
+          <div className="md:col-span-2">
+            <Link to="/" className="flex items-center gap-2 mb-5 group w-fit">
+              <div className="w-8 h-8 bg-blue-600 flex items-center justify-center rounded-sm">
+                <Zap className="w-4 h-4 text-white fill-white" />
+              </div>
+              <span className="font-display text-2xl text-white tracking-widest">DH-INSPIRED</span>
+            </Link>
+            <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+              Unisex streetwear and fashion trends. Built for those who move different. Quality fits, bold style.
             </p>
-          </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-purple-300 text-sm">
-              <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-              <li><Link to="/products" className="hover:text-white transition-colors">Shop</Link></li>
-              <li><Link to="/checkout" className="hover:text-white transition-colors">Checkout</Link></li>
-            </ul>
-          </div>
-
-          {/* Social */}
-          <div>
-            <h4 className="font-semibold text-white mb-4">Follow Us</h4>
-            <div className="flex gap-4">
-              {socialLinks.map((s) =>
+            {/* Socials */}
+            <div className="flex gap-2 mt-6">
+              {socialLinks.map((s) => (
                 s.href ? (
                   <a
                     key={s.label}
@@ -151,29 +131,71 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    className={`text-purple-300 transition-colors duration-200 ${s.color}`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-sm text-gray-500 border border-white/10 transition-all duration-200 ${s.hoverClass}`}
                   >
                     {s.icon}
                   </a>
                 ) : (
                   <span
                     key={s.label}
-                    className="text-purple-600 cursor-not-allowed"
                     title={`${s.label} not configured`}
+                    className="w-10 h-10 flex items-center justify-center rounded-sm text-gray-700 border border-white/5 cursor-not-allowed"
                   >
                     {s.icon}
                   </span>
                 )
-              )}
+              ))}
             </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-xs font-black tracking-[0.2em] text-gray-500 uppercase mb-5">Navigate</h4>
+            <ul className="space-y-3">
+              {[
+                { to: '/', label: 'Home' },
+                { to: '/products', label: 'Shop All' },
+                { to: '/checkout', label: 'Checkout' },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <Link to={to} className="text-sm text-gray-400 hover:text-white transition-colors font-medium">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Info */}
+          <div>
+            <h4 className="text-xs font-black tracking-[0.2em] text-gray-500 uppercase mb-5">Info</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li>Guest checkout — no account needed</li>
+              <li>Bank transfer payment</li>
+              <li>Delivery & pickup available</li>
+              {socials.whatsapp_number && (
+                <li>
+                  <a
+                    href={`https://wa.me/${socials.whatsapp_number.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-400 hover:text-green-300 font-semibold transition-colors"
+                  >
+                    Chat on WhatsApp →
+                  </a>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-purple-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-purple-400 text-sm">
-          <p>© {new Date().getFullYear()} DH-Inspired. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link to="/products?page=terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link to="/products?page=privacy" className="hover:text-white transition-colors">Privacy</Link>
+        <div className="mt-14 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-gray-600 text-xs tracking-widest uppercase">
+            © {new Date().getFullYear()} DH-Inspired. All Rights Reserved.
+          </p>
+          <div className="flex gap-6 text-xs tracking-widest uppercase">
+            <Link to="/products?page=terms" className="text-gray-600 hover:text-white transition-colors">Terms</Link>
+            <Link to="/products?page=privacy" className="text-gray-600 hover:text-white transition-colors">Privacy</Link>
           </div>
         </div>
       </div>
