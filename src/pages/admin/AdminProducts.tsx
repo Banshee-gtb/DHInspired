@@ -90,20 +90,17 @@ export default function AdminProducts() {
       }
     }
     await supabase.from('products').update({ is_featured: newVal }).eq('id', product.id);
-    toast.success(newVal ? 'Marked as featured (New Arrival)' : 'Removed from featured');
+    toast.success(newVal ? 'Marked as featured' : 'Removed from featured');
     fetchProducts();
   };
 
   const addTag = () => {
     const tag = tagInput.trim().toLowerCase();
-    if (tag && !form.tags.includes(tag)) {
-      setForm((f) => ({ ...f, tags: [...f.tags, tag] }));
-    }
+    if (tag && !form.tags.includes(tag)) setForm((f) => ({ ...f, tags: [...f.tags, tag] }));
     setTagInput('');
   };
 
   const removeTag = (tag: string) => setForm((f) => ({ ...f, tags: f.tags.filter((t) => t !== tag) }));
-
   const addVariant = () => setVariants((v) => [...v, { ...emptyVariant }]);
   const removeVariant = (i: number) => setVariants((v) => v.filter((_, idx) => idx !== i));
   const updateVariant = (i: number, key: string, val: string | number) => {
@@ -146,7 +143,9 @@ export default function AdminProducts() {
         await supabase.from('product_variants').update({ color: v.color, size: v.size, price: v.price, stock: v.stock }).eq('id', v.id!);
       }
       if (newVariants.length) {
-        await supabase.from('product_variants').insert(newVariants.map((v) => ({ product_id: productId, color: v.color, size: v.size, price: v.price ?? 0, stock: v.stock ?? 0 })));
+        await supabase.from('product_variants').insert(newVariants.map((v) => ({
+          product_id: productId, color: v.color, size: v.size, price: v.price ?? 0, stock: v.stock ?? 0,
+        })));
       }
     }
 
@@ -163,12 +162,21 @@ export default function AdminProducts() {
     fetchProducts();
   };
 
+  const Toggle = ({ value, onChange }: { value: boolean; onChange: () => void }) => (
+    <div onClick={onChange} className={`w-11 h-6 rounded-full transition-colors cursor-pointer flex-shrink-0 relative ${value ? 'bg-blue-600' : 'bg-navy-600'}`}>
+      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
+    </div>
+  );
+
   return (
     <div className="max-w-5xl space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+        <div>
+          <h1 className="font-display text-3xl text-white tracking-wider">PRODUCTS</h1>
+          <p className="text-gray-500 text-xs uppercase tracking-widest mt-1">{products.length} total</p>
+        </div>
         <button onClick={openCreate} className="dh-btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Product
+          <Plus className="w-4 h-4" /> New Product
         </button>
       </div>
 
@@ -176,9 +184,9 @@ export default function AdminProducts() {
       {showForm && (
         <div className="admin-card animate-fade-in">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-bold text-gray-900 text-xl">{editProduct ? 'Edit Product' : 'New Product'}</h2>
-            <button onClick={() => setShowForm(false)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <X className="w-5 h-5 text-gray-500" />
+            <h2 className="font-black text-white text-lg tracking-wide uppercase">{editProduct ? 'Edit Product' : 'New Product'}</h2>
+            <button onClick={() => setShowForm(false)} className="p-2 rounded-xl hover:bg-white/10 transition-colors">
+              <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
@@ -186,217 +194,213 @@ export default function AdminProducts() {
             {/* Left */}
             <div className="space-y-4">
               <div>
-                <label className="dh-label">Product Title *</label>
-                <input className="dh-input" placeholder="e.g. Elegant Floral Dress" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
+                <label className="dh-label-dark">Product Title *</label>
+                <input className="dh-input-dark" placeholder="e.g. Classic Hoodie" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
               </div>
 
               <div>
-                <label className="dh-label">Description</label>
-                <textarea className="dh-input resize-none" rows={3} placeholder="Describe the product..." value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+                <label className="dh-label-dark">Description</label>
+                <textarea className="dh-input-dark resize-none" rows={3} placeholder="Describe the product..." value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
               </div>
 
               <div>
-                <label className="dh-label">Category</label>
-                <select className="dh-input" value={form.category_id ?? ''} onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value || null }))}>
+                <label className="dh-label-dark">Category</label>
+                <select className="dh-input-dark" value={form.category_id ?? ''} onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value || null }))}>
                   <option value="">No Category</option>
                   {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="dh-label">Tags</label>
+                <label className="dh-label-dark">Tags</label>
                 <div className="flex gap-2">
                   <input
-                    className="dh-input flex-1"
+                    className="dh-input-dark flex-1"
                     placeholder="Add tag, press Enter"
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                   />
-                  <button onClick={addTag} type="button" className="px-4 py-3 bg-purple-100 text-dh-purple rounded-xl font-medium hover:bg-purple-200 transition-colors text-sm">Add</button>
+                  <button onClick={addTag} type="button" className="px-4 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-500 transition-colors text-sm">
+                    Add
+                  </button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {form.tags.map((tag) => (
-                    <span key={tag} className="flex items-center gap-1 bg-purple-100 text-dh-purple text-xs px-3 py-1 rounded-full font-medium">
+                    <span key={tag} className="flex items-center gap-1 bg-blue-500/15 text-blue-400 text-xs px-3 py-1.5 rounded-full font-bold">
                       #{tag}
-                      <button onClick={() => removeTag(tag)} className="hover:text-dh-purple-dark"><X className="w-3 h-3" /></button>
+                      <button onClick={() => removeTag(tag)} className="hover:text-red-400"><X className="w-3 h-3" /></button>
                     </span>
                   ))}
                 </div>
               </div>
 
               {/* Toggles */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-2">
                 {[
-                  { label: 'Active', key: 'is_active' },
-                  { label: 'Has Variants', key: 'has_variants' },
-                  { label: '⭐ Featured', key: 'is_featured' },
+                  { label: 'Active (visible to customers)', key: 'is_active' },
+                  { label: 'Has Variants (color/size)', key: 'has_variants' },
+                  { label: '⭐ Featured (homepage)', key: 'is_featured' },
                 ].map((toggle) => (
-                  <label key={toggle.key} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-purple-50 transition-colors">
-                    <div
-                      onClick={() => setForm((f) => ({ ...f, [toggle.key]: !f[toggle.key as keyof typeof f] }))}
-                      className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer flex-shrink-0 ${form[toggle.key as keyof typeof form] ? 'bg-dh-purple' : 'bg-gray-300'}`}
-                    >
-                      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form[toggle.key as keyof typeof form] ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">{toggle.label}</span>
+                  <label key={toggle.key} className="flex items-center justify-between p-3 bg-navy-900/50 rounded-xl cursor-pointer hover:bg-navy-900 transition-colors">
+                    <span className="text-sm font-medium text-gray-300">{toggle.label}</span>
+                    <Toggle
+                      value={!!form[toggle.key as keyof typeof form]}
+                      onChange={() => setForm((f) => ({ ...f, [toggle.key]: !f[toggle.key as keyof typeof f] }))}
+                    />
                   </label>
                 ))}
               </div>
 
               {!form.has_variants && (
                 <div>
-                  <label className="dh-label">Base Price (₦)</label>
-                  <input type="number" min="0" className="dh-input" placeholder="0.00" value={form.base_price} onChange={(e) => setForm((f) => ({ ...f, base_price: Number(e.target.value) }))} />
+                  <label className="dh-label-dark">Base Price (₦)</label>
+                  <input type="number" min="0" className="dh-input-dark" placeholder="0.00" value={form.base_price} onChange={(e) => setForm((f) => ({ ...f, base_price: Number(e.target.value) }))} />
                 </div>
               )}
             </div>
 
             {/* Right */}
-            <div className="space-y-4">
-              <div>
-                <label className="dh-label">Product Images (Upload from file only)</label>
-                <ImageUploader images={form.images} onChange={(imgs) => setForm((f) => ({ ...f, images: imgs }))} />
-              </div>
+            <div>
+              <label className="dh-label-dark">Product Images</label>
+              <ImageUploader images={form.images} onChange={(imgs) => setForm((f) => ({ ...f, images: imgs }))} />
             </div>
           </div>
 
           {/* Variants */}
           {form.has_variants && (
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-800">Variants</h3>
-                <button onClick={addVariant} type="button" className="flex items-center gap-1 text-sm text-dh-purple font-medium hover:text-dh-purple-dark">
+            <div className="mt-6 pt-6 border-t border-navy-700/50">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-black text-white text-sm uppercase tracking-widest">Variants</h3>
+                <button onClick={addVariant} type="button" className="flex items-center gap-1.5 text-sm text-blue-400 font-bold hover:text-blue-300">
                   <Plus className="w-4 h-4" /> Add Variant
                 </button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {variants.map((v, i) => (
-                  <div key={i} className="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end bg-purple-50 p-3 rounded-xl">
+                  <div key={i} className="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end bg-navy-900/60 p-3 rounded-xl">
                     <div>
-                      <label className="text-xs text-gray-500 font-medium">Color</label>
-                      <input className="dh-input text-sm py-2" placeholder="e.g. Red" value={v.color ?? ''} onChange={(e) => updateVariant(i, 'color', e.target.value)} />
+                      <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Color</label>
+                      <input className="dh-input-dark text-sm py-2 mt-1" placeholder="e.g. Red" value={v.color ?? ''} onChange={(e) => updateVariant(i, 'color', e.target.value)} />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500 font-medium">Size</label>
-                      <input className="dh-input text-sm py-2" placeholder="e.g. M" value={v.size ?? ''} onChange={(e) => updateVariant(i, 'size', e.target.value)} />
+                      <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Size</label>
+                      <input className="dh-input-dark text-sm py-2 mt-1" placeholder="e.g. M" value={v.size ?? ''} onChange={(e) => updateVariant(i, 'size', e.target.value)} />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500 font-medium">Price (₦)</label>
-                      <input type="number" min="0" className="dh-input text-sm py-2" placeholder="0" value={v.price ?? ''} onChange={(e) => updateVariant(i, 'price', Number(e.target.value))} />
+                      <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Price (₦)</label>
+                      <input type="number" min="0" className="dh-input-dark text-sm py-2 mt-1" placeholder="0" value={v.price ?? ''} onChange={(e) => updateVariant(i, 'price', Number(e.target.value))} />
                     </div>
                     <div className="flex gap-2">
                       <div className="flex-1">
-                        <label className="text-xs text-gray-500 font-medium">Stock</label>
-                        <input type="number" min="0" className="dh-input text-sm py-2" placeholder="0" value={v.stock ?? ''} onChange={(e) => updateVariant(i, 'stock', Number(e.target.value))} />
+                        <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Stock</label>
+                        <input type="number" min="0" className="dh-input-dark text-sm py-2 mt-1" placeholder="0" value={v.stock ?? ''} onChange={(e) => updateVariant(i, 'stock', Number(e.target.value))} />
                       </div>
-                      <button onClick={() => removeVariant(i)} className="mt-auto p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <button onClick={() => removeVariant(i)} className="mt-auto p-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 ))}
                 {variants.length === 0 && (
-                  <p className="text-sm text-gray-400 text-center py-4">No variants yet. Click "Add Variant" to start.</p>
+                  <p className="text-sm text-gray-600 text-center py-6 bg-navy-900/30 rounded-xl">Click "Add Variant" to start</p>
                 )}
               </div>
             </div>
           )}
 
-          <div className="flex gap-3 mt-6 pt-6 border-t border-gray-100">
+          <div className="flex gap-3 mt-6 pt-6 border-t border-navy-700/50">
             <button onClick={handleSave} disabled={saving} className="dh-btn-primary flex items-center gap-2 disabled:opacity-60">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {saving ? 'Saving...' : 'Save Product'}
             </button>
-            <button onClick={() => setShowForm(false)} className="dh-btn-outline">Cancel</button>
+            <button onClick={() => setShowForm(false)} className="px-5 py-3 border border-navy-600 text-gray-400 hover:text-white hover:border-navy-500 rounded-xl transition-all font-bold text-sm uppercase tracking-wider">
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input className="dh-input pl-12" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <input className="dh-input-dark pl-11" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {/* Products List */}
       <div className="space-y-3">
         {loading ? (
-          [...Array(4)].map((_, i) => <div key={i} className="admin-card h-20 skeleton" />)
+          [...Array(4)].map((_, i) => <div key={i} className="admin-card h-20 skeleton-dark" />)
         ) : products.length === 0 ? (
-          <div className="admin-card text-center py-12 text-gray-400">
-            <p>No products found.</p>
-          </div>
+          <div className="admin-card text-center py-12 text-gray-500">No products found.</div>
         ) : (
           products.map((p) => (
-            <div key={p.id} className="admin-card">
+            <div key={p.id} className="admin-card hover:border-navy-600/80 transition-colors">
               <div className="flex gap-4 items-start">
                 {p.images?.[0] ? (
                   <img src={p.images[0]} alt={p.title} className="w-16 h-16 object-cover rounded-xl flex-shrink-0" />
                 ) : (
-                  <div className="w-16 h-16 bg-purple-50 rounded-xl flex-shrink-0 flex items-center justify-center text-purple-200">
-                    <Search className="w-6 h-6" />
+                  <div className="w-16 h-16 bg-navy-900 rounded-xl flex-shrink-0 flex items-center justify-center">
+                    <Search className="w-5 h-5 text-navy-700" />
                   </div>
                 )}
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-bold text-gray-900 truncate">{p.title}</h3>
-                    {p.is_featured && <span className="featured-badge"><Star className="w-3 h-3 fill-current" />Featured</span>}
-                    {!p.is_active && <span className="bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full">Inactive</span>}
-                    {p.has_variants && <span className="bg-blue-100 text-blue-600 text-xs font-semibold px-2 py-0.5 rounded-full">{p.product_variants?.length ?? 0} variants</span>}
+                  <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                    <h3 className="font-black text-white text-sm truncate">{p.title}</h3>
+                    {p.is_featured && <span className="featured-badge flex items-center gap-0.5"><Star className="w-2.5 h-2.5 fill-current" />Featured</span>}
+                    {!p.is_active && <span className="bg-gray-500/15 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Inactive</span>}
+                    {p.has_variants && <span className="bg-blue-500/15 text-blue-400 text-[10px] font-bold px-2 py-0.5 rounded-full">{p.product_variants?.length ?? 0} variants</span>}
                   </div>
-                  <p className="text-sm text-dh-purple font-bold mt-0.5">
+                  <p className="text-sm text-blue-400 font-black">
                     {p.has_variants && p.product_variants?.length ? `From ${formatPrice(Math.min(...p.product_variants.map((v) => v.price)))}` : formatPrice(p.base_price)}
                   </p>
                   {p.tags && p.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
-                      {p.tags.map((t) => <span key={t} className="text-xs bg-purple-50 text-purple-500 px-2 py-0.5 rounded-full">#{t}</span>)}
+                      {p.tags.map((t) => <span key={t} className="text-[10px] bg-navy-900 text-gray-500 px-2 py-0.5 rounded-full">#{t}</span>)}
                     </div>
                   )}
                 </div>
 
-                <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => handleFeaturedToggle(p)} title={p.is_featured ? 'Remove from featured' : 'Mark as featured'} className={`p-2 rounded-lg transition-colors ${p.is_featured ? 'text-dh-gold bg-yellow-50 hover:bg-yellow-100' : 'text-gray-400 hover:text-dh-gold hover:bg-yellow-50'}`}>
+                <div className="flex gap-1 flex-shrink-0">
+                  <button onClick={() => handleFeaturedToggle(p)} className={`p-2 rounded-xl transition-colors ${p.is_featured ? 'text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20' : 'text-gray-600 hover:text-yellow-400 hover:bg-yellow-500/10'}`}>
                     <Star className={`w-4 h-4 ${p.is_featured ? 'fill-current' : ''}`} />
                   </button>
-                  <button onClick={() => setExpandedId(expandedId === p.id ? null : p.id)} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                  <button onClick={() => setExpandedId(expandedId === p.id ? null : p.id)} className="p-2 rounded-xl text-gray-600 hover:text-white hover:bg-white/10 transition-colors">
                     {expandedId === p.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
-                  <button onClick={() => openEdit(p)} className="p-2 rounded-lg text-dh-purple hover:bg-purple-50 transition-colors">
+                  <button onClick={() => openEdit(p)} className="p-2 rounded-xl text-blue-400 hover:bg-blue-500/10 transition-colors">
                     <Pencil className="w-4 h-4" />
                   </button>
-                  <button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-lg text-red-400 hover:bg-red-50 transition-colors">
+                  <button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Expanded Variants */}
               {expandedId === p.id && p.product_variants && p.product_variants.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 mb-2">VARIANTS</p>
+                <div className="mt-4 pt-4 border-t border-navy-700/50">
+                  <p className="text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">Variants</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {p.product_variants.map((v) => (
-                      <div key={v.id} className="bg-purple-50 rounded-lg p-2.5 text-xs">
-                        <div className="flex justify-between">
-                          <span className="font-medium text-gray-700">{[v.color, v.size].filter(Boolean).join(' / ') || 'Default'}</span>
-                          <span className={`font-semibold ${v.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>{v.stock} stock</span>
+                      <div key={v.id} className="bg-navy-900/60 rounded-xl p-3 text-xs">
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-gray-300">{[v.color, v.size].filter(Boolean).join(' / ') || 'Default'}</span>
+                          <span className={`font-bold text-[10px] ${v.stock > 0 ? 'text-green-400' : 'text-red-400'}`}>{v.stock} stock</span>
                         </div>
-                        <p className="text-dh-purple font-bold mt-0.5">{formatPrice(v.price)}</p>
+                        <p className="text-blue-400 font-black mt-0.5">{formatPrice(v.price)}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Delete Confirm */}
               {deleteConfirm === p.id && (
-                <div className="mt-3 p-4 bg-red-50 rounded-xl flex items-center justify-between gap-3">
-                  <p className="text-sm text-red-700 font-medium">Delete "{p.title}"? This cannot be undone.</p>
+                <div className="mt-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center justify-between gap-3">
+                  <p className="text-sm text-red-400 font-medium">Delete "{p.title}"? Cannot be undone.</p>
                   <div className="flex gap-2">
-                    <button onClick={() => setDeleteConfirm(null)} className="text-sm px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100">Cancel</button>
-                    <button onClick={() => handleDelete(p.id)} className="text-sm px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600">Delete</button>
+                    <button onClick={() => setDeleteConfirm(null)} className="text-sm px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10">Cancel</button>
+                    <button onClick={() => handleDelete(p.id)} className="text-sm px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 font-bold">Delete</button>
                   </div>
                 </div>
               )}

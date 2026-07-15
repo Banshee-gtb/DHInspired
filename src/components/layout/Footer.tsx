@@ -18,7 +18,6 @@ function InstagramIcon() {
     </svg>
   );
 }
-
 function TikTokIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -26,7 +25,6 @@ function TikTokIcon() {
     </svg>
   );
 }
-
 function XIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -34,7 +32,6 @@ function XIcon() {
     </svg>
   );
 }
-
 function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -42,7 +39,6 @@ function WhatsAppIcon() {
     </svg>
   );
 }
-
 function ShopifyBagIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -59,11 +55,7 @@ const MARQUEE_ITEMS = [
 
 export default function Footer() {
   const [socials, setSocials] = useState<SocialLinks>({
-    instagram_url: '',
-    tiktok_url: '',
-    twitter_url: '',
-    shopify_url: '',
-    whatsapp_number: '',
+    instagram_url: '', tiktok_url: '', twitter_url: '', shopify_url: '', whatsapp_number: '',
   });
 
   useEffect(() => {
@@ -87,15 +79,15 @@ export default function Footer() {
   }, []);
 
   const socialLinks = [
-    { href: socials.instagram_url, icon: <InstagramIcon />, label: 'Instagram', hoverClass: 'hover:text-pink-500 hover:bg-pink-500/10' },
-    { href: socials.tiktok_url, icon: <TikTokIcon />, label: 'TikTok', hoverClass: 'hover:text-white hover:bg-white/10' },
-    { href: socials.whatsapp_number ? `https://wa.me/${socials.whatsapp_number.replace(/\D/g, '')}` : '', icon: <WhatsAppIcon />, label: 'WhatsApp', hoverClass: 'hover:text-green-400 hover:bg-green-500/10' },
-    { href: socials.twitter_url, icon: <XIcon />, label: 'X', hoverClass: 'hover:text-white hover:bg-white/10' },
-    { href: socials.shopify_url, icon: <ShopifyBagIcon />, label: 'Shopify', hoverClass: 'hover:text-[#95bf47] hover:bg-[#95bf47]/10' },
+    { href: socials.instagram_url, icon: <InstagramIcon />, label: 'Instagram', hoverClass: 'hover:text-pink-500 hover:border-pink-300 hover:bg-pink-50' },
+    { href: socials.tiktok_url, icon: <TikTokIcon />, label: 'TikTok', hoverClass: 'hover:text-gray-900 hover:border-gray-400 hover:bg-gray-50' },
+    { href: socials.whatsapp_number ? `https://wa.me/${socials.whatsapp_number.replace(/\D/g, '')}` : '', icon: <WhatsAppIcon />, label: 'WhatsApp', hoverClass: 'hover:text-green-600 hover:border-green-400 hover:bg-green-50' },
+    { href: socials.twitter_url, icon: <XIcon />, label: 'X', hoverClass: 'hover:text-gray-900 hover:border-gray-400 hover:bg-gray-50' },
+    { href: socials.shopify_url, icon: <ShopifyBagIcon />, label: 'Shopify', hoverClass: 'hover:text-[#95bf47] hover:border-[#95bf47] hover:bg-[#95bf47]/10' },
   ];
 
   return (
-    <footer className="bg-navy-950 border-t border-white/5">
+    <footer className="bg-navy-950 text-white">
       {/* Marquee */}
       <div className="overflow-hidden border-y border-white/5 bg-navy-900 py-3">
         <div className="flex animate-marquee whitespace-nowrap gap-10">
@@ -111,19 +103,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-5 group w-fit">
-              <div className="w-8 h-8 bg-blue-600 flex items-center justify-center rounded-sm">
-                <Zap className="w-4 h-4 text-white fill-white" />
-              </div>
-              <span className="font-display text-2xl text-white tracking-widest">DH-INSPIRED</span>
+            <Link to="/" className="flex items-center gap-2.5 mb-5 group w-fit">
+              <img src="/logo.png" alt="DH-Inspired" className="w-10 h-10 rounded-xl object-cover" />
+              <span className="font-display text-2xl text-white tracking-widest group-hover:text-blue-400 transition-colors">DH-INSPIRED</span>
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
               Unisex streetwear and fashion trends. Built for those who move different. Quality fits, bold style.
             </p>
 
-            {/* Socials */}
             <div className="flex gap-2 mt-6">
-              {socialLinks.map((s) => (
+              {socialLinks.map((s) =>
                 s.href ? (
                   <a
                     key={s.label}
@@ -131,20 +120,19 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    className={`w-10 h-10 flex items-center justify-center rounded-sm text-gray-500 border border-white/10 transition-all duration-200 ${s.hoverClass}`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-xl text-gray-500 border border-white/10 transition-all duration-200 ${s.hoverClass}`}
                   >
                     {s.icon}
                   </a>
                 ) : (
                   <span
                     key={s.label}
-                    title={`${s.label} not configured`}
-                    className="w-10 h-10 flex items-center justify-center rounded-sm text-gray-700 border border-white/5 cursor-not-allowed"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl text-gray-700 border border-white/5 cursor-not-allowed"
                   >
                     {s.icon}
                   </span>
                 )
-              ))}
+              )}
             </div>
           </div>
 
@@ -169,7 +157,7 @@ export default function Footer() {
           {/* Info */}
           <div>
             <h4 className="text-xs font-black tracking-[0.2em] text-gray-500 uppercase mb-5">Info</h4>
-            <ul className="space-y-3 text-sm text-gray-400">
+            <ul className="space-y-3 text-sm text-gray-500">
               <li>Guest checkout — no account needed</li>
               <li>Bank transfer payment</li>
               <li>Delivery & pickup available</li>

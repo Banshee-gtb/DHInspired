@@ -86,10 +86,10 @@ export default function SearchAutocomplete({ value, onChange, placeholder = 'Sea
       </div>
 
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-navy-200 shadow-2xl z-50 overflow-hidden animate-fade-in">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-gray-200 shadow-2xl shadow-black/10 z-50 overflow-hidden animate-fade-in">
           {loading ? (
             <div className="p-4 flex items-center gap-3">
-              <div className="w-4 h-4 border-2 border-navy-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
               <span className="text-sm text-gray-500">Searching...</span>
             </div>
           ) : results.length === 0 ? (
@@ -100,9 +100,9 @@ export default function SearchAutocomplete({ value, onChange, placeholder = 'Sea
                 <li key={r.id}>
                   <button
                     onMouseDown={() => handleSelect(r.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-navy-50 transition-colors text-left ${i < results.length - 1 ? 'border-b border-gray-100' : ''}`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left ${i < results.length - 1 ? 'border-b border-gray-100' : ''}`}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
                       {r.images?.[0] ? (
                         <img src={r.images[0]} alt={r.title} className="w-full h-full object-cover" />
                       ) : (
@@ -112,8 +112,8 @@ export default function SearchAutocomplete({ value, onChange, placeholder = 'Sea
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{r.title}</p>
-                      <p className="text-xs text-navy-600 font-medium">
+                      <p className="text-sm font-bold text-gray-900 truncate">{r.title}</p>
+                      <p className="text-xs text-blue-600 font-semibold mt-0.5">
                         {r.has_variants ? 'Multiple variants' : r.base_price > 0 ? `₦${r.base_price.toLocaleString()}` : 'Price on request'}
                       </p>
                     </div>
@@ -123,8 +123,8 @@ export default function SearchAutocomplete({ value, onChange, placeholder = 'Sea
               ))}
               <li>
                 <button
-                  onMouseDown={() => { setOpen(false); }}
-                  className="w-full px-4 py-2.5 text-xs text-center text-navy-600 font-semibold hover:bg-navy-50 transition-colors border-t border-gray-100"
+                  onMouseDown={() => setOpen(false)}
+                  className="w-full px-4 py-2.5 text-xs text-center text-blue-600 font-bold hover:bg-blue-50 transition-colors border-t border-gray-100"
                 >
                   See all results for "{value}" →
                 </button>

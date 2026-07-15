@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Package, Tag, TrendingUp, ArrowRight, Clock, Settings, Zap } from 'lucide-react';
+import { ShoppingBag, Package, Tag, TrendingUp, ArrowRight, Clock, Settings } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Order } from '@/lib/types';
 import { formatPrice, formatDate } from '@/lib/utils';
@@ -14,11 +14,11 @@ interface Stats {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:   'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30',
-  confirmed: 'bg-blue-500/10 text-blue-400 border border-blue-500/30',
-  shipped:   'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30',
-  delivered: 'bg-green-500/10 text-green-400 border border-green-500/30',
-  cancelled: 'bg-red-500/10 text-red-400 border border-red-500/30',
+  pending:   'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
+  confirmed: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
+  shipped:   'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20',
+  delivered: 'bg-green-500/15 text-green-400 border border-green-500/20',
+  cancelled: 'bg-red-500/15 text-red-400 border border-red-500/20',
 };
 
 export default function AdminDashboard() {
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
     return (
       <div className="space-y-6 max-w-5xl">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="admin-card h-28 skeleton" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="admin-card h-28 skeleton-dark" />)}
         </div>
       </div>
     );
@@ -68,25 +68,25 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-[10px] font-black tracking-[0.3em] text-gray-600 uppercase">Control Center</span>
-          <h1 className="font-display text-5xl text-white tracking-wider mt-1">DASHBOARD</h1>
+          <h1 className="font-display text-5xl text-white tracking-wider mt-0.5">DASHBOARD</h1>
         </div>
         <InstallPWAButton />
       </div>
 
-      {/* Stats */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {statCards.map((card) => (
           <Link
             key={card.label}
             to={card.link}
-            className={`admin-card hover:border-opacity-80 transition-all group relative overflow-hidden border ${card.accent}`}
+            className={`admin-card hover:translate-y-[-2px] transition-all group relative overflow-hidden border-2 ${card.accent}`}
           >
             <div className="flex items-start justify-between mb-4">
               <card.icon className={`w-5 h-5 ${card.iconClass}`} />
-              <ArrowRight className="w-3.5 h-3.5 text-gray-700 group-hover:text-white transition-colors" />
+              <ArrowRight className="w-3.5 h-3.5 text-navy-700 group-hover:text-white transition-colors" />
             </div>
-            <p className="font-black text-white text-2xl leading-none">{card.value}</p>
-            <p className="text-xs text-gray-500 mt-1.5 uppercase tracking-widest font-bold">{card.label}</p>
+            <p className="font-black text-white text-3xl leading-none">{card.value}</p>
+            <p className="text-[10px] text-gray-500 mt-2 uppercase tracking-widest font-black">{card.label}</p>
           </Link>
         ))}
       </div>
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
             <Clock className="w-4 h-4 text-blue-400" />
             <h2 className="text-xs font-black tracking-[0.2em] text-gray-400 uppercase">Recent Orders</h2>
           </div>
-          <Link to="/admin/orders" className="text-xs font-black tracking-widest text-gray-500 hover:text-blue-400 uppercase transition-colors flex items-center gap-1">
+          <Link to="/admin/orders" className="text-xs font-black tracking-widest text-gray-600 hover:text-blue-400 uppercase transition-colors flex items-center gap-1">
             View All <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
@@ -113,18 +113,18 @@ export default function AdminDashboard() {
             {recentOrders.map((order) => (
               <div
                 key={order.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-navy-900 border border-navy-700 hover:border-navy-600 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-navy-900/60 rounded-xl border border-navy-700/40 hover:border-navy-600/60 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-bold text-white text-sm">{order.customer_name}</p>
-                    <span className={`text-[10px] font-black px-2 py-0.5 uppercase tracking-widest ${STATUS_STYLES[order.status] || 'bg-gray-500/10 text-gray-400 border border-gray-500/30'}`}>
+                    <p className="font-black text-white text-sm">{order.customer_name}</p>
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${STATUS_STYLES[order.status] || 'bg-gray-500/15 text-gray-400 border border-gray-500/20'}`}>
                       {order.status}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 mt-0.5">{order.customer_phone} · {formatDate(order.created_at)}</p>
                 </div>
-                <p className="font-black text-blue-400 flex-shrink-0">{formatPrice(order.amount_paid)}</p>
+                <p className="font-black text-blue-400">{formatPrice(order.amount_paid)}</p>
               </div>
             ))}
           </div>
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div className="admin-card">
-        <h2 className="text-xs font-black tracking-[0.2em] text-gray-400 uppercase mb-4">Quick Actions</h2>
+        <h2 className="text-xs font-black tracking-[0.2em] text-gray-500 uppercase mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { to: '/admin/products', icon: ShoppingBag, label: 'ADD PRODUCT', color: 'hover:border-blue-500/60 hover:bg-blue-500/10', iconColor: 'text-blue-400' },
@@ -144,10 +144,10 @@ export default function AdminDashboard() {
             <Link
               key={to}
               to={to}
-              className={`flex flex-col items-center gap-2.5 p-4 bg-navy-900 border border-navy-700 transition-all ${color} group`}
+              className={`flex flex-col items-center gap-3 p-4 bg-navy-900/40 border border-navy-700/40 rounded-2xl transition-all ${color} group`}
             >
               <Icon className={`w-5 h-5 ${iconColor}`} />
-              <span className="text-[10px] font-black tracking-[0.15em] text-gray-500 group-hover:text-white transition-colors text-center">{label}</span>
+              <span className="text-[10px] font-black tracking-[0.15em] text-gray-500 group-hover:text-white transition-colors text-center uppercase">{label}</span>
             </Link>
           ))}
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Product, Category } from '@/lib/types';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -97,15 +97,16 @@ export default function Products() {
   const hasFilters = !!(search || selectedCategory || selectedTags.length > 0 || inStockOnly || maxPrice < 100000);
 
   return (
-    <div className="min-h-screen bg-navy-950">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <div className="pt-16">
         {/* Header */}
-        <div className="bg-navy-900 border-b border-white/5 py-14 relative overflow-hidden">
-          <div className="absolute inset-0 bg-grid opacity-20" />
+        <div className="bg-navy-950 py-14 relative overflow-hidden">
+          <div className="absolute inset-0 bg-grid opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <span className="section-tag">Collection</span>
+            <span className="section-tag-white">Collection</span>
             <h1 className="font-display text-6xl sm:text-7xl font-bold text-white tracking-wider">ALL PRODUCTS</h1>
           </div>
         </div>
@@ -134,10 +135,10 @@ export default function Products() {
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-4 py-3 font-black text-xs tracking-widest uppercase border transition-all ${
+                className={`flex items-center gap-2 px-4 py-3 font-black text-xs tracking-widest uppercase rounded-xl border-2 transition-all ${
                   showFilters || hasFilters
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-navy-800 text-gray-400 border-navy-700 hover:border-blue-500/50 hover:text-white'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
+                    : 'bg-white text-gray-500 border-gray-200 hover:border-blue-400 hover:text-blue-600'
                 }`}
               >
                 <SlidersHorizontal className="w-4 h-4" />
@@ -149,18 +150,17 @@ export default function Products() {
 
           {/* Filters Panel */}
           {showFilters && (
-            <div className="bg-navy-800 border border-navy-700 p-5 mb-6 animate-fade-in space-y-5">
+            <div className="glass-card bg-white/80 p-5 mb-6 animate-fade-in space-y-5 border border-gray-200 rounded-2xl">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black tracking-[0.2em] text-gray-400 uppercase">Filters</h3>
+                <h3 className="text-xs font-black tracking-[0.2em] text-gray-500 uppercase">Filters</h3>
                 {hasFilters && (
-                  <button onClick={clearFilters} className="text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wider">
+                  <button onClick={clearFilters} className="text-xs text-red-500 hover:text-red-600 font-bold uppercase tracking-wider">
                     Clear all
                   </button>
                 )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                {/* Category */}
                 <div>
                   <label className="dh-label">Category</label>
                   <select
@@ -175,7 +175,6 @@ export default function Products() {
                   </select>
                 </div>
 
-                {/* Price */}
                 <div>
                   <label className="dh-label">Max Price: ₦{maxPrice.toLocaleString()}</label>
                   <input
@@ -190,18 +189,17 @@ export default function Products() {
                   />
                 </div>
 
-                {/* In-Stock */}
                 <div>
                   <label className="dh-label">Availability</label>
                   <button
                     onClick={() => setInStockOnly(!inStockOnly)}
-                    className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-widest border transition-all ${
+                    className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl border-2 transition-all ${
                       inStockOnly
-                        ? 'bg-green-500/10 border-green-500/50 text-green-400'
-                        : 'bg-navy-900 border-navy-600 text-gray-500 hover:border-green-500/30 hover:text-green-400'
+                        ? 'bg-green-50 border-green-400 text-green-700'
+                        : 'bg-white border-gray-200 text-gray-500 hover:border-green-400 hover:text-green-600'
                     }`}
                   >
-                    <div className={`w-4 h-4 flex items-center justify-center border ${inStockOnly ? 'bg-green-500 border-green-500' : 'border-gray-600'}`}>
+                    <div className={`w-4 h-4 flex items-center justify-center rounded border-2 ${inStockOnly ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
                       {inStockOnly && <span className="text-white text-[10px] font-black">✓</span>}
                     </div>
                     In Stock Only
@@ -209,7 +207,6 @@ export default function Products() {
                 </div>
               </div>
 
-              {/* Tags */}
               {allTags.length > 0 && (
                 <div>
                   <label className="dh-label">Tags</label>
@@ -218,10 +215,10 @@ export default function Products() {
                       <button
                         key={tag}
                         onClick={() => toggleTag(tag)}
-                        className={`px-3 py-1.5 text-xs font-bold border transition-all uppercase tracking-wider ${
+                        className={`px-3 py-1.5 text-xs font-bold rounded-full border-2 transition-all uppercase tracking-wider ${
                           selectedTags.includes(tag)
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-navy-900 text-gray-500 border-navy-600 hover:border-blue-500/50 hover:text-gray-300'
+                            : 'bg-white text-gray-500 border-gray-200 hover:border-blue-400 hover:text-blue-600'
                         }`}
                       >
                         {tag}
@@ -233,20 +230,18 @@ export default function Products() {
             </div>
           )}
 
-          {/* Count */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-500 text-xs tracking-widest uppercase font-bold">
+            <p className="text-gray-400 text-xs tracking-widest uppercase font-bold">
               {loading ? 'Loading...' : `${products.length} product${products.length !== 1 ? 's' : ''}`}
             </p>
           </div>
 
-          {/* Grid */}
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => (
                 <div key={i}>
                   <div className="aspect-[3/4] skeleton" />
-                  <div className="mt-3 space-y-2 p-3">
+                  <div className="mt-3 space-y-2 px-1">
                     <div className="h-3 skeleton" />
                     <div className="h-3 skeleton w-2/3" />
                   </div>
@@ -254,15 +249,13 @@ export default function Products() {
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-24">
-              <p className="font-display text-5xl text-navy-700 tracking-wider mb-4">NOTHING FOUND</p>
-              <p className="text-gray-600 text-sm uppercase tracking-widest font-bold mb-8">Try adjusting your search or filters</p>
-              <button onClick={clearFilters} className="dh-btn-outline text-sm">
-                CLEAR FILTERS
-              </button>
+            <div className="text-center py-24 bg-gray-50 rounded-3xl">
+              <p className="font-display text-5xl text-gray-200 tracking-wider mb-4">NOTHING FOUND</p>
+              <p className="text-gray-400 text-sm uppercase tracking-widest font-bold mb-8">Try adjusting your search or filters</p>
+              <button onClick={clearFilters} className="dh-btn-outline text-sm">CLEAR FILTERS</button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

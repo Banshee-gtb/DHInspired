@@ -6,26 +6,26 @@
 
 @layer base {
   :root {
-    --background: 220 30% 8%;
-    --foreground: 210 20% 95%;
-    --card: 220 25% 12%;
-    --card-foreground: 210 20% 95%;
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 20% 95%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
     --primary: 214 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 20% 90%;
-    --muted: 220 20% 16%;
-    --muted-foreground: 220 15% 55%;
-    --accent: 214 80% 20%;
-    --accent-foreground: 214 100% 70%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 214 100% 50%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   * {
@@ -33,7 +33,7 @@
   }
 
   body {
-    @apply bg-navy-950 text-white font-sans antialiased;
+    @apply bg-white text-gray-900 font-sans antialiased;
   }
 
   html {
@@ -42,77 +42,111 @@
 }
 
 @layer components {
-  /* Glass effects */
+  /* ============ GLASS EFFECTS ============ */
   .glass {
-    @apply backdrop-blur-xl bg-white/5 border border-white/10;
+    @apply backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl;
   }
 
-  .glass-light {
-    @apply backdrop-blur-md bg-navy-900/80 border border-navy-700/50;
+  .glass-dark {
+    @apply backdrop-blur-xl bg-navy-950/80 border border-white/10 rounded-2xl;
   }
 
-  /* Buttons */
+  .glass-white {
+    @apply backdrop-blur-xl bg-white/80 border border-gray-200/60 rounded-2xl shadow-lg shadow-black/5;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-white/70 border border-gray-200/80 rounded-2xl shadow-sm;
+  }
+
+  /* ============ BUTTONS ============ */
   .dh-btn-primary {
-    @apply bg-blue-600 text-white font-bold px-6 py-3 rounded-sm
+    @apply bg-blue-600 text-white font-bold px-6 py-3 rounded-xl
            hover:bg-blue-500 active:scale-[0.98] transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-navy-900
-           tracking-wide uppercase text-sm;
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+           tracking-wide uppercase text-sm shadow-lg shadow-blue-600/25;
   }
 
   .dh-btn-outline {
-    @apply border-2 border-white text-white font-bold px-6 py-3 rounded-sm
+    @apply border-2 border-navy-800 text-navy-800 font-bold px-6 py-3 rounded-xl
+           hover:bg-navy-800 hover:text-white active:scale-[0.98] transition-all duration-150
+           tracking-wide uppercase text-sm;
+  }
+
+  .dh-btn-outline-white {
+    @apply border-2 border-white text-white font-bold px-6 py-3 rounded-xl
            hover:bg-white hover:text-navy-950 active:scale-[0.98] transition-all duration-150
            tracking-wide uppercase text-sm;
   }
 
   .dh-btn-ghost {
-    @apply text-gray-300 font-semibold px-4 py-2 rounded-sm
-           hover:bg-white/10 hover:text-white active:scale-[0.98] transition-all duration-150;
+    @apply text-gray-600 font-semibold px-4 py-2 rounded-xl
+           hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98] transition-all duration-150;
   }
 
-  /* Inputs */
+  /* ============ INPUTS ============ */
   .dh-input {
-    @apply w-full px-4 py-3 rounded-sm border border-navy-700 bg-navy-800/80
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-white
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           placeholder-gray-400 text-gray-900 transition-all duration-200
+           text-sm shadow-sm;
+  }
+
+  .dh-input-dark {
+    @apply w-full px-4 py-3 rounded-xl border border-navy-700 bg-navy-800/80
            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
            placeholder-gray-500 text-white transition-all duration-200
            text-sm;
   }
 
   .dh-label {
+    @apply block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-widest;
+  }
+
+  .dh-label-dark {
     @apply block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-widest;
   }
 
-  /* Cards */
+  /* ============ PUBLIC CARDS ============ */
+  .store-card {
+    @apply bg-white border border-gray-100 rounded-2xl overflow-hidden
+           hover:border-blue-200 hover:shadow-xl hover:shadow-blue-100/50
+           transition-all duration-300 hover:-translate-y-1;
+  }
+
+  /* ============ ADMIN CARDS ============ */
   .admin-card {
-    @apply bg-navy-800 rounded-sm border border-navy-700 p-6;
+    @apply bg-navy-800/60 backdrop-blur-sm rounded-2xl border border-navy-700/60 p-6
+           shadow-sm;
   }
 
-  /* Badges */
+  .admin-card-light {
+    @apply bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6;
+  }
+
+  /* ============ BADGES ============ */
   .featured-badge {
-    @apply inline-flex items-center gap-1 bg-yellow-500 text-black text-xs font-black
-           px-2 py-0.5 rounded-sm tracking-wide uppercase;
+    @apply inline-flex items-center gap-1 bg-yellow-400 text-black text-[10px] font-black
+           px-2 py-0.5 rounded-full tracking-wide uppercase;
   }
 
-  /* Skeleton */
-  .skeleton {
-    @apply bg-gradient-to-r from-navy-800 via-navy-700 to-navy-800 
-           bg-[length:200%_100%] animate-shimmer;
-  }
-
-  /* Product card */
-  .product-card {
-    @apply bg-navy-800 border border-navy-700 overflow-hidden
-           hover:border-blue-500/50 transition-all duration-300
-           hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-900/30;
-  }
-
-  /* Section headers */
   .section-tag {
-    @apply inline-block text-blue-400 text-xs font-black uppercase tracking-[0.2em] mb-3;
+    @apply inline-block text-blue-600 text-xs font-black uppercase tracking-[0.2em] mb-2;
   }
 
-  .display-heading {
-    @apply font-display text-white leading-none tracking-wide;
+  .section-tag-white {
+    @apply inline-block text-blue-300 text-xs font-black uppercase tracking-[0.2em] mb-2;
+  }
+
+  /* ============ SKELETON ============ */
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100
+           bg-[length:200%_100%] animate-shimmer rounded-xl;
+  }
+
+  .skeleton-dark {
+    @apply bg-gradient-to-r from-navy-800 via-navy-700 to-navy-800
+           bg-[length:200%_100%] animate-shimmer rounded-xl;
   }
 }
 
@@ -126,7 +160,7 @@
   }
 
   .text-gradient-blue {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500;
   }
 
   .text-gradient-white {
@@ -134,27 +168,28 @@
   }
 }
 
-/* Animated background grid */
+/* ============ ANIMATED BACKGROUND GRID ============ */
 .bg-grid {
   background-image: 
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
-/* Noise texture */
-.bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
+.bg-grid-light {
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-/* Range inputs */
+/* ============ RANGE INPUTS ============ */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 3px;
+  height: 4px;
   border-radius: 9999px;
-  background: linear-gradient(to right, #2563EB var(--range-progress, 50%), #1e3a5f var(--range-progress, 50%));
+  background: linear-gradient(to right, #2563EB var(--range-progress, 50%), #e5e7eb var(--range-progress, 50%));
   outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
@@ -164,42 +199,11 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #2563EB;
   cursor: pointer;
-  box-shadow: 0 0 0 3px #0f172a, 0 0 0 5px #2563EB;
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px #2563EB;
   transition: box-shadow 0.15s;
 }
 
-/* Gallery transitions */
-.gallery-slide {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Sidebar transitions */
-.sidebar-transition {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Animated gradient border */
-@keyframes gradient-border {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.animate-gradient-border {
-  animation: gradient-border 3s ease infinite;
-  background-size: 200% 200%;
-}
-
-/* Marquee animation */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee 20s linear infinite;
-}
-
-/* Custom keyframes */
+/* ============ CUSTOM KEYFRAMES ============ */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -225,7 +229,44 @@ input[type="range"]::-webkit-slider-thumb {
   100% { transform: translateY(100vh); }
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes heroFade {
+  0% { opacity: 0; transform: scale(1.04); }
+  8% { opacity: 1; transform: scale(1); }
+  38% { opacity: 1; transform: scale(1.03); }
+  45% { opacity: 0; transform: scale(1.05); }
+  100% { opacity: 0; }
+}
+
 .animate-fade-in { animation: fadeIn 0.4s ease-out both; }
 .animate-slide-up { animation: slideUp 0.5s ease-out both; }
 .animate-shimmer { animation: shimmer 2s infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
+.animate-marquee { animation: marquee 25s linear infinite; }
+.animate-slide-in-right { animation: slideInRight 0.4s ease-out both; }
+
+/* ============ GALLERY ============ */
+.gallery-slide {
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ============ HERO IMAGE SLIDE ============ */
+.hero-slide {
+  animation: heroFade 12s ease-in-out infinite;
+}
+.hero-slide:nth-child(2) { animation-delay: 4s; }
+.hero-slide:nth-child(3) { animation-delay: 8s; }
+
+/* ============ PRODUCT CARD HOVER ACTIONS ============ */
+.product-actions-overlay {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}

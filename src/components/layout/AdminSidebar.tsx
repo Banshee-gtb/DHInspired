@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, ShoppingBag, Package, Tag, Users, Settings, LogOut, X, Zap,
+  LayoutDashboard, ShoppingBag, Package, Tag, Users, Settings, LogOut, X, ExternalLink,
 } from 'lucide-react';
 import { useAdmin } from '@/contexts/AdminContext';
 import { cn } from '@/lib/utils';
@@ -32,18 +32,19 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-blue-600 flex items-center justify-center rounded-sm">
-            <Zap className="w-4 h-4 text-white fill-white" />
+      <div className="flex items-center justify-between px-5 py-5 border-b border-white/5">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="DH" className="w-9 h-9 rounded-xl object-cover" />
+          <div>
+            <span className="font-display text-lg text-white tracking-widest leading-none block">DH-INSPIRED</span>
+            <span className="text-[9px] text-gray-600 font-black tracking-[0.2em] uppercase">Admin Panel</span>
           </div>
-          <span className="font-display text-xl text-white tracking-widest">DH-ADMIN</span>
         </div>
         <button
           onClick={onClose}
-          className="md:hidden p-1 text-gray-500 hover:text-white transition-colors"
+          className="md:hidden p-1.5 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
@@ -57,10 +58,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               to={item.path}
               onClick={onClose}
               className={cn(
-                'flex items-center gap-3 px-4 py-2.5 font-bold text-xs tracking-[0.15em] uppercase transition-all duration-150',
+                'flex items-center gap-3 px-4 py-3 font-black text-xs tracking-[0.15em] uppercase transition-all duration-150 rounded-xl',
                 isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                  : 'text-gray-500 hover:bg-white/5 hover:text-gray-200'
               )}
             >
               <item.icon className={cn('w-4 h-4 flex-shrink-0', isActive ? 'text-white' : 'text-gray-600')} />
@@ -71,18 +72,18 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-white/5">
+      <div className="px-3 py-4 border-t border-white/5 space-y-0.5">
         <Link
           to="/"
           target="_blank"
-          className="flex items-center gap-3 px-4 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-gray-600 hover:text-gray-300 hover:bg-white/5 transition-all mb-1"
+          className="flex items-center gap-3 px-4 py-3 text-xs font-black tracking-[0.15em] uppercase text-gray-500 hover:text-gray-200 hover:bg-white/5 rounded-xl transition-all"
         >
-          <ShoppingBag className="w-4 h-4" />
+          <ExternalLink className="w-4 h-4" />
           VIEW STORE
         </Link>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-bold tracking-[0.15em] uppercase text-red-500 hover:bg-red-500/10 hover:text-red-400 transition-all"
+          className="flex items-center gap-3 w-full px-4 py-3 text-xs font-black tracking-[0.15em] uppercase text-red-500 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-all"
         >
           <LogOut className="w-4 h-4" />
           SIGN OUT
@@ -101,10 +102,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* Mobile drawer */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={onClose}
-          />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
           <aside className="relative w-64 bg-navy-900 border-r border-white/5 flex flex-col sidebar-transition">
             <SidebarContent />
           </aside>

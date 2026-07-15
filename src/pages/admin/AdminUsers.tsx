@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users } from 'lucide-react';
+import { Users, Phone, Mail, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Order } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
@@ -38,44 +38,35 @@ export default function AdminUsers() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-      <p className="text-gray-500 text-sm">Customers who have placed orders (guest checkout).</p>
+      <div>
+        <h1 className="font-display text-3xl text-white tracking-wider">CUSTOMERS</h1>
+        <p className="text-gray-500 text-xs uppercase tracking-widest mt-1">Guest checkout customers from orders</p>
+      </div>
 
       {loading ? (
-        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="admin-card h-16 skeleton" />)}</div>
+        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="admin-card h-16 skeleton-dark" />)}</div>
       ) : customers.length === 0 ? (
-        <div className="admin-card text-center py-12">
-          <Users className="w-12 h-12 mx-auto text-gray-200 mb-3" />
-          <p className="text-gray-400">No customers yet</p>
+        <div className="admin-card text-center py-16">
+          <Users className="w-12 h-12 mx-auto text-navy-700 mb-3" />
+          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">No customers yet</p>
         </div>
       ) : (
-        <div className="admin-card">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left text-xs font-semibold text-gray-400 uppercase pb-3 pr-4">Name</th>
-                  <th className="text-left text-xs font-semibold text-gray-400 uppercase pb-3 pr-4">Phone</th>
-                  <th className="text-left text-xs font-semibold text-gray-400 uppercase pb-3 pr-4 hidden sm:table-cell">Email</th>
-                  <th className="text-left text-xs font-semibold text-gray-400 uppercase pb-3 pr-4">Orders</th>
-                  <th className="text-left text-xs font-semibold text-gray-400 uppercase pb-3 hidden md:table-cell">Last Order</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {customers.map((c) => (
-                  <tr key={c.phone} className="hover:bg-purple-50 transition-colors">
-                    <td className="py-3 pr-4 font-medium text-gray-800">{c.name}</td>
-                    <td className="py-3 pr-4 text-gray-600">{c.phone}</td>
-                    <td className="py-3 pr-4 text-gray-500 hidden sm:table-cell">{c.email || '—'}</td>
-                    <td className="py-3 pr-4">
-                      <span className="bg-purple-100 text-dh-purple font-bold text-xs px-2.5 py-1 rounded-full">{c.orderCount}</span>
-                    </td>
-                    <td className="py-3 text-gray-400 text-xs hidden md:table-cell">{formatDate(c.lastOrder)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="space-y-2">
+          {customers.map((c) => (
+            <div key={c.phone} className="admin-card hover:border-navy-600/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-white text-sm">{c.name}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-500">
+                  <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{c.phone}</span>
+                  {c.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{c.email}</span>}
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(c.lastOrder)}</span>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 bg-blue-500/15 text-blue-400 text-xs font-black px-3 py-1.5 rounded-full flex-shrink-0">
+                {c.orderCount} order{c.orderCount !== 1 ? 's' : ''}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
