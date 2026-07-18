@@ -86,3 +86,12 @@ export interface DeliveryOption {
   fee: number;
   is_active: boolean;
 }
+
+export interface ProductReview {
+  id: string;
+  product_id: string;
+  customer_name: string;
+  rating: number;
+  review_text: string;
+  created_at: string;
+}

@@ -8,9 +8,11 @@ import { supabase } from '@/lib/supabase';
 import { Product, ProductVariant } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/contexts/CartContext';
+import { useProductLike } from '@/hooks/useProductLike';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppBubble from '@/components/features/WhatsAppBubble';
+import ProductReviews from '@/components/features/ProductReviews';
 import { toast } from 'sonner';
 
 export default function ProductDetail() {
@@ -25,9 +27,11 @@ export default function ProductDetail() {
   const [added, setAdded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [wished, setWished] = useState(false);
+  const [avgRating, setAvgRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
 
-  // Touch/swipe
+  const { liked, likeCount, toggleLike } = useProductLike(id ?? '');
+
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
@@ -47,9 +51,7 @@ export default function ProductDetail() {
   useEffect(() => {
     if (!product?.has_variants || !product.product_variants) return;
     const found = product.product_variants.find(
-      (v) =>
-        (!selectedColor || v.color === selectedColor) &&
-        (!selectedSize || v.size === selectedSize)
+      (v) => (!selectedColor || v.color === selectedColor) && (!selectedSize || v.size === selectedSize)
     );
     setSelectedVariant(found ?? null);
   }, [selectedColor, selectedSize, product]);
@@ -112,20 +114,20 @@ export default function ProductDetail() {
     setTimeout(() => setAdded(false), 2500);
   };
 
-  /* ── LOADING ────────────── */
+  /* LOADING */
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="aspect-[4/5] skeleton" />
+            <div className="aspect-[4/5] bg-gray-100 rounded-3xl animate-pulse" />
             <div className="space-y-5 pt-4">
-              <div className="h-10 skeleton w-3/4" />
-              <div className="h-6 skeleton w-1/3" />
-              <div className="h-28 skeleton" />
+              <div className="h-10 bg-gray-100 rounded-xl w-3/4 animate-pulse" />
+              <div className="h-6 bg-gray-100 rounded-xl w-1/3 animate-pulse" />
+              <div className="h-28 bg-gray-100 rounded-xl animate-pulse" />
               <div className="grid grid-cols-4 gap-2">
-                {[...Array(4)].map((_, i) => <div key={i} className="h-10 skeleton" />)}
+                {[...Array(4)].map((_, i) => <div key={i} className="h-10 bg-gray-100 rounded-xl animate-pulse" />)}
               </div>
             </div>
           </div>
@@ -151,29 +153,26 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* ── LIGHTBOX ──────────────────────── */}
+      {/* LIGHTBOX */}
       {lightboxOpen && images.length > 0 && (
         <div
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center"
           onClick={() => setLightboxOpen(false)}
         >
-          <button
-            onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 p-2 text-white hover:text-gray-300 transition-colors z-10"
-          >
+          <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 p-2 text-white hover:text-gray-300 z-10">
             <X className="w-8 h-8" />
           </button>
           {images.length > 1 && (
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-2xl text-white transition-colors z-10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-2xl text-white z-10"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-2xl text-white transition-colors z-10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-2xl text-white z-10"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -185,6 +184,9 @@ export default function ProductDetail() {
             className="max-h-[90vh] max-w-[90vw] object-contain animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           />
+          <p className="absolute bottom-4 text-white/50 text-xs font-bold tracking-widest">
+            {currentImageIndex + 1} / {images.length}
+          </p>
         </div>
       )}
 
@@ -192,19 +194,15 @@ export default function ProductDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
           {/* Breadcrumb */}
-          <Link
-            to="/products"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-600 text-sm font-semibold mb-8 transition-colors"
-          >
+          <Link to="/products" className="inline-flex items-center gap-2 text-gray-400 hover:text-blue-600 text-sm font-semibold mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
 
-            {/* ── IMAGE GALLERY ──────────────── */}
+            {/* IMAGE GALLERY */}
             <div className="space-y-3">
-              {/* Main image */}
               <div
                 className="relative aspect-[4/5] bg-gray-50 rounded-3xl overflow-hidden cursor-zoom-in group"
                 onTouchStart={onTouchStart}
@@ -216,6 +214,7 @@ export default function ProductDetail() {
                     src={images[currentImageIndex]}
                     alt={product.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="eager"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -223,12 +222,10 @@ export default function ProductDetail() {
                   </div>
                 )}
 
-                {/* Zoom hint */}
                 <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
                   <ZoomIn className="w-4 h-4 text-gray-600" />
                 </div>
 
-                {/* Badges */}
                 <div className="absolute top-3 left-3 flex flex-col gap-1.5">
                   {product.is_featured && (
                     <span className="featured-badge flex items-center gap-1">
@@ -238,7 +235,6 @@ export default function ProductDetail() {
                   )}
                 </div>
 
-                {/* Prev/next arrows */}
                 {images.length > 1 && (
                   <>
                     <button
@@ -256,7 +252,6 @@ export default function ProductDetail() {
                   </>
                 )}
 
-                {/* Dot indicators */}
                 {images.length > 1 && (
                   <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {images.map((_, i) => (
@@ -264,9 +259,7 @@ export default function ProductDetail() {
                         key={i}
                         onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }}
                         className={`rounded-full transition-all duration-200 ${
-                          i === currentImageIndex
-                            ? 'bg-blue-600 w-5 h-2'
-                            : 'bg-white/60 w-2 h-2 hover:bg-white'
+                          i === currentImageIndex ? 'bg-blue-600 w-5 h-2' : 'bg-white/60 w-2 h-2 hover:bg-white'
                         }`}
                       />
                     ))}
@@ -274,7 +267,7 @@ export default function ProductDetail() {
                 )}
               </div>
 
-              {/* Thumbnail strip */}
+              {/* Thumbnails */}
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                   {images.map((img, i) => (
@@ -287,17 +280,17 @@ export default function ProductDetail() {
                           : 'border-transparent hover:border-gray-300'
                       }`}
                     >
-                      <img src={img} alt={`${product.title} ${i + 1}`} className="w-full h-full object-cover" />
+                      <img src={img} alt={`${product.title} ${i + 1}`} loading="lazy" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* ── PRODUCT INFO ───────────────── */}
+            {/* PRODUCT INFO */}
             <div className="space-y-6">
 
-              {/* Category & wishlist row */}
+              {/* Category & actions row */}
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-2">
                   {product.category && (
@@ -308,12 +301,13 @@ export default function ProductDetail() {
                   )}
                 </div>
                 <button
-                  onClick={() => setWished(!wished)}
-                  className={`p-2.5 rounded-xl border-2 transition-all ${
-                    wished ? 'border-red-300 bg-red-50 text-red-500' : 'border-gray-200 hover:border-red-200 text-gray-400 hover:text-red-400'
+                  onClick={toggleLike}
+                  className={`flex items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                    liked ? 'border-red-300 bg-red-50 text-red-500' : 'border-gray-200 hover:border-red-200 text-gray-400 hover:text-red-400'
                   }`}
                 >
-                  <Heart className={`w-4 h-4 ${wished ? 'fill-current' : ''}`} />
+                  <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
+                  {likeCount > 0 && <span className="text-xs font-black">{likeCount}</span>}
                 </button>
               </div>
 
@@ -322,10 +316,23 @@ export default function ProductDetail() {
                 {product.title.toUpperCase()}
               </h1>
 
+              {/* Rating summary */}
+              {reviewCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[1,2,3,4,5].map((s) => (
+                      <Star key={s} className={`w-4 h-4 ${s <= Math.round(avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`} />
+                    ))}
+                  </div>
+                  <span className="text-sm font-bold text-gray-700">{avgRating.toFixed(1)}</span>
+                  <span className="text-sm text-gray-400">({reviewCount} review{reviewCount !== 1 ? 's' : ''})</span>
+                </div>
+              )}
+
               {/* Price */}
               <div className="flex items-end gap-4">
                 <p className="font-black text-blue-600 text-3xl">
-                  {product.has_variants && !selectedVariant ? `From ` : ''}{formatPrice(displayPrice)}
+                  {product.has_variants && !selectedVariant ? 'From ' : ''}{formatPrice(displayPrice)}
                 </p>
                 {stockCount !== null && (
                   <p className={`text-sm font-bold pb-1 ${stockCount > 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -339,10 +346,9 @@ export default function ProductDetail() {
                 <p className="text-gray-600 leading-relaxed text-base">{product.description}</p>
               )}
 
-              {/* ── VARIANT SELECTORS ─────────── */}
+              {/* VARIANTS */}
               {product.has_variants && (
                 <div className="space-y-5">
-                  {/* Colors */}
                   {colors.length > 0 && (
                     <div>
                       <label className="dh-label">
@@ -366,7 +372,6 @@ export default function ProductDetail() {
                     </div>
                   )}
 
-                  {/* Sizes */}
                   {sizes.length > 0 && (
                     <div>
                       <label className="dh-label">
@@ -375,10 +380,7 @@ export default function ProductDetail() {
                       <div className="flex flex-wrap gap-2 mt-2">
                         {sizes.map((size) => {
                           const available = product.product_variants?.some(
-                            (v) =>
-                              v.size === size &&
-                              (!selectedColor || v.color === selectedColor) &&
-                              v.stock > 0
+                            (v) => v.size === size && (!selectedColor || v.color === selectedColor) && v.stock > 0
                           );
                           return (
                             <button
@@ -443,7 +445,7 @@ export default function ProductDetail() {
                     added
                       ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
                       : inStock
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 active:scale-[0.98]'
+                      ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >
@@ -453,7 +455,6 @@ export default function ProductDetail() {
                     <><ShoppingCart className="w-5 h-5" /> {inStock ? `Add to Cart — ${formatPrice(displayPrice * quantity)}` : 'Out of Stock'}</>
                   )}
                 </button>
-
                 {product.has_variants && !selectedVariant && (
                   <p className="text-center text-xs text-amber-500 font-bold mt-2 uppercase tracking-wider">
                     ↑ Select a color & size to continue
@@ -462,12 +463,20 @@ export default function ProductDetail() {
               </div>
             </div>
           </div>
+
+          {/* REVIEWS SECTION */}
+          <ProductReviews
+            productId={product.id}
+            onAvgRatingUpdate={(avg, count) => {
+              setAvgRating(avg);
+              setReviewCount(count);
+            }}
+          />
         </div>
       </div>
 
-      {/* ── STICKY BOTTOM BAR (Mobile) ─────────────── */}
+      {/* STICKY BOTTOM BAR (Mobile) */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
-        {/* glass blur layer */}
         <div className="bg-white/90 backdrop-blur-xl border-t border-gray-200/80 px-4 py-3 shadow-2xl shadow-black/10">
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
